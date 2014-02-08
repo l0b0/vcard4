@@ -49,6 +49,8 @@ virtualenv_tarball_signature_path = $(download_directory)/$(virtualenv_tarball_s
 
 virtualenv_tarball_pgp_public_key_id = 3372DCFA
 
+site_packages_directory = $(virtualenv_directory)/lib/python$(python_series)/site-packages
+
 SETUP = setup.py
 INSTALL_OPTIONS := -O2
 UPLOAD_OPTIONS = --sign --identity=$(GPG_ID)
@@ -93,11 +95,11 @@ $(virtualenv): $(virtualenv_tarball_path) $(system_python) $(virtualenv_tarball_
 $(virtualenv_python): $(system_python) $(virtualenv)
 	$(virtualenv) --python=$(system_python) $(virtualenv_directory)
 
-$(virtualenv_directory)/bin/pep8:
-	. $(virtualenv_directory)/bin/activate && pip install $(notdir $@)
+$(site_packages_directory)/%.py:
+	. $(virtualenv_directory)/bin/activate && pip install $(basename $(notdir $@))
 
 .PHONY: test
-test: $(virtualenv_python) $(virtualenv_directory)/bin/pep8
+test: $(virtualenv_python) $(site_packages_directory)/mock.py $(site_packages_directory)/pep8.py
 	. $(virtualenv_directory)/bin/activate && \
 		$(virtualenv_python) $(SETUP) test && \
 		make METHOD=git python-pep8
