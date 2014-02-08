@@ -27,9 +27,9 @@ class TestRFC6350(unittest.TestCase):
         self.assertRaises(VcardError, verify_line_endings, "baz\n\r")
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error_content(self):
-        invalid_vcard_lines = [MINIMAL_VCARD_LINES[0]] + [line + "\r" for line in MINIMAL_VCARD_LINES[1:]]
+        invalid_vcard_lines = ["foo", "bar\nbaz", "ban"]
         first_invalid_line_index = 1
-        first_invalid_character_index = len(MINIMAL_VCARD_LINES[1])
+        first_invalid_character_index = 3
         with self.assertRaises(VcardError) as error:
             verify_line_endings(invalid_vcard_lines)
 
