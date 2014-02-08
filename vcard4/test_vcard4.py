@@ -11,19 +11,22 @@ MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK = RFC5322_LINE_BREAK.join(MI
 
 class TestRFC6350(unittest.TestCase):
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break(self):
-        self.assertEqual(
-            split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK),
-            {"lines": MINIMAL_VCARD_LINES, "issues": []})
+        result = split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK, mock.Mock())
+        self.assertEqual(result["lines"], MINIMAL_VCARD_LINES)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_delegation(self):
         mocked_validator = mock.Mock()
         split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK, mocked_validator)
         mocked_validator.assert_called_once_with(MINIMAL_VCARD_LINES)
 
-    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_split_error(self):
-        result = split_lines("foo\r\nbar\nbaz\r")
+    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_return_value(self):
+        mocked_validator = mock.Mock(return_value="whatever")
+        result = split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK, mocked_validator)
+        self.assertEqual(result["issues"], "whatever")
+
+    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_partial_success(self):
+        result = split_lines("foo\r\nbar\nbaz\r", mock.Mock())
         self.assertEqual(result["lines"], ["foo", "bar\nbaz\r"])
-        self.assertEqual(len(result["issues"]), 2)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation(self):
         self.assertEqual(validate_line_endings(MINIMAL_VCARD_LINES), [])
