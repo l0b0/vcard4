@@ -18,6 +18,9 @@ class TestRFC6350(unittest.TestCase):
         split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK, mocked_validator)
         mocked_validator.assert_called_once_with(MINIMAL_VCARD_LINES)
 
+    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validator(self):
+        self.assertEqual(verify_line_endings("foo"), None)
+
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error(self):
         self.assertRaises(VcardError, verify_line_endings, "foo\r")
         self.assertRaises(VcardError, verify_line_endings, "bar\n")
