@@ -1,6 +1,7 @@
 import re
 
-INVALID_LINE_BREAK = re.compile(r"\n\r|\r(?!\n)|(?<!\r)\n")
+RFC5322_LINE_BREAK = "\r\n"
+INVALID_LINE_BREAKS = re.compile("|".join(RFC5322_LINE_BREAK))
 
 
 class VcardError(Exception):
@@ -10,8 +11,10 @@ class VcardError(Exception):
         self.message = "{0} at character {1}".format(message, self.character)
 
 
-def validate_newlines(vcard_text):
-    invalid_newlines = INVALID_LINE_BREAK.search(vcard_text)
-    if invalid_newlines is not None:
-        raise VcardError("Invalid line delimiter", invalid_newlines.end())
-    return True
+def split_lines(vcard_text):
+    lines = vcard_text.split(RFC5322_LINE_BREAK)
+    for line in lines:
+        invalid_newlines = INVALID_LINE_BREAKS.search(line)
+        if invalid_newlines is not None:
+            raise VcardError("Invalid line delimiter", invalid_newlines.end())
+    return lines

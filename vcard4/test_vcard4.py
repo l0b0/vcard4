@@ -1,6 +1,6 @@
 import unittest
 
-from vcard4 import validate_newlines, VcardError
+from vcard4 import split_lines, VcardError
 
 
 MINIMAL_VCARD_LINES = ["BEGIN:VCARD", "VERSION:4.0", "FN:Rene van der Harten", "END:VCARD"]
@@ -13,15 +13,15 @@ MINIMAL_VCARD_LINES_SEPARATED_BY_NL_CR = "\n\r".join(MINIMAL_VCARD_LINES)
 
 class TestRFC6350(unittest.TestCase):
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break(self):
-        self.assertTrue(validate_newlines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK))
-        self.assertRaises(VcardError, validate_newlines, MINIMAL_VCARD_LINES_SEPARATED_BY_CR)
-        self.assertRaises(VcardError, validate_newlines, MINIMAL_VCARD_LINES_SEPARATED_BY_NL)
-        self.assertRaises(VcardError, validate_newlines, MINIMAL_VCARD_LINES_SEPARATED_BY_NL_CR)
+        self.assertEqual(split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK), MINIMAL_VCARD_LINES)
+        self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_CR)
+        self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_NL)
+        self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_NL_CR)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error(self):
         first_invalid_character = len(MINIMAL_VCARD_LINES[0]) + 1
         with self.assertRaises(VcardError) as error:
-            validate_newlines(MINIMAL_VCARD_LINES_SEPARATED_BY_CR)
+            split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_CR)
 
         self.assertEqual(
             error.exception.message,
