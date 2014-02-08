@@ -5,21 +5,20 @@ INVALID_LINE_BREAKS_MATCHER = re.compile("|".join(RFC5322_LINE_BREAK))
 
 
 def verify_line_endings(lines):
+    issues = []
     for line_index in range(len(lines)):
-        invalid_newlines = INVALID_LINE_BREAKS_MATCHER.search(lines[line_index])
-        if invalid_newlines is not None:
-            raise VcardError("Invalid line delimiter", line_index, invalid_newlines.start())
+        for invalid_newline in INVALID_LINE_BREAKS_MATCHER.finditer(lines[line_index]):
+            issues.append(VcardError("Invalid line delimiter", line_index, invalid_newline.start()))
+    return issues
 
 
 def split_lines(text, validator=verify_line_endings):
     lines = text.split(RFC5322_LINE_BREAK)
-    validator(lines)
-    return lines
+    return {"lines": lines, "issues": validator(lines)}
 
 
-class VcardError(Exception):
+class VcardError(object):
     def __init__(self, message, line_index, character_index):
-        super(VcardError, self).__init__(message)
         self.line_index = line_index
         self.character_index = character_index
         self.message = "{0} at line {1}, character {2}".format(message, self.line_index + 1, self.character_index + 1)

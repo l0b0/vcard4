@@ -11,35 +11,33 @@ MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK = RFC5322_LINE_BREAK.join(MI
 
 class TestRFC6350(unittest.TestCase):
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break(self):
-        self.assertEqual(split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK), MINIMAL_VCARD_LINES)
+        self.assertEqual(
+            split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK),
+            {"lines": MINIMAL_VCARD_LINES, "issues": []})
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_delegation(self):
         mocked_validator = mock.Mock()
         split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK, mocked_validator)
         mocked_validator.assert_called_once_with(MINIMAL_VCARD_LINES)
 
-    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validator(self):
-        self.assertEqual(verify_line_endings("foo"), None)
+    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_split_error(self):
+        result = split_lines("foo\r\nbar\nbaz\r")
+        self.assertEqual(result["lines"], ["foo", "bar\nbaz\r"])
+        self.assertEqual(len(result["issues"]), 2)
 
-    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error(self):
-        self.assertRaises(VcardError, verify_line_endings, "foo\r")
-        self.assertRaises(VcardError, verify_line_endings, "bar\n")
-        self.assertRaises(VcardError, verify_line_endings, "baz\n\r")
+    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation(self):
+        self.assertEqual(verify_line_endings(MINIMAL_VCARD_LINES), [])
 
-    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error_content(self):
-        invalid_vcard_lines = ["foo", "bar\nbaz", "ban"]
-        first_invalid_line_index = 1
-        first_invalid_character_index = 3
-        with self.assertRaises(VcardError) as error:
-            verify_line_endings(invalid_vcard_lines)
+    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_error(self):
+        issues = verify_line_endings(["foo", "bar\nbaz"])
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].message, "Invalid line delimiter at line {0}, character {1}".format(2, 4))
+        self.assertEqual(issues[0].line_index, 1)
+        self.assertEqual(issues[0].character_index, 3)
 
-        self.assertEqual(
-            error.exception.message,
-            "Invalid line delimiter at line {0}, character {1}".format(
-                first_invalid_line_index + 1,
-                first_invalid_character_index + 1))
-        self.assertEqual(error.exception.line_index, first_invalid_line_index)
-        self.assertEqual(error.exception.character_index, first_invalid_character_index)
+    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_multiple_errors(self):
+        issues = verify_line_endings(["fo\no\n", "\rban\r", "\r", "\n"])
+        self.assertEqual(len(issues), 6)
 
 
 if __name__ == '__main__':
