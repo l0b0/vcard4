@@ -19,12 +19,9 @@ class TestRFC6350(unittest.TestCase):
         mocked_validator.assert_called_once_with(MINIMAL_VCARD_LINES)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error(self):
-        minimal_vcard_lines_separated_by_carriage_return = "\r".join(MINIMAL_VCARD_LINES)
-        minimal_vcard_lines_separated_by_newline = "\n".join(MINIMAL_VCARD_LINES)
-        minimal_vcard_lines_separated_by_reversed_line_break = "\n\r".join(MINIMAL_VCARD_LINES)
-        self.assertRaises(VcardError, split_lines, minimal_vcard_lines_separated_by_carriage_return)
-        self.assertRaises(VcardError, split_lines, minimal_vcard_lines_separated_by_newline)
-        self.assertRaises(VcardError, split_lines, minimal_vcard_lines_separated_by_reversed_line_break)
+        self.assertRaises(VcardError, verify_line_endings, "foo\r")
+        self.assertRaises(VcardError, verify_line_endings, "bar\n")
+        self.assertRaises(VcardError, verify_line_endings, "baz\n\r")
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error_content(self):
         invalid_vcard_lines = [MINIMAL_VCARD_LINES[0]] + [line + "\r" for line in MINIMAL_VCARD_LINES[1:]]
