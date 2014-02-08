@@ -1,6 +1,6 @@
 import unittest
 
-from vcard4 import split_lines, VcardError
+from vcard4 import split_lines, verify_line_endings, VcardError
 
 
 MINIMAL_VCARD_LINES = ["BEGIN:VCARD", "VERSION:4.0", "FN:Rene van der Harten", "END:VCARD"]
@@ -19,11 +19,11 @@ class TestRFC6350(unittest.TestCase):
         self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_REVERSED_LINE_BREAK)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error(self):
-        invalid_vcard = MINIMAL_VCARD_LINES[0] + RFC5322_LINE_BREAK + "\r".join(MINIMAL_VCARD_LINES[1:])
+        invalid_vcard_lines = [MINIMAL_VCARD_LINES[0]] + [line + "\r" for line in MINIMAL_VCARD_LINES[1:]]
         first_invalid_line_index = 1
         first_invalid_character_index = len(MINIMAL_VCARD_LINES[1])
         with self.assertRaises(VcardError) as error:
-            split_lines(invalid_vcard)
+            verify_line_endings(invalid_vcard_lines)
 
         self.assertEqual(
             error.exception.message,
