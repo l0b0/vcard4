@@ -31,14 +31,16 @@ class TestRFC6350(unittest.TestCase):
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_error(self):
         issues = verify_line_endings(["foo", "bar\nbaz"])
         self.assertEqual(len(issues), 1)
-        self.assertEqual(issues[0].message, "Invalid line delimiter at line {0}, character {1}".format(2, 4))
-        self.assertEqual(issues[0].line_index, 1)
-        self.assertEqual(issues[0].character_index, 3)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_multiple_errors(self):
         issues = verify_line_endings(["fo\no\n", "\rban\r", "\r", "\n"])
         self.assertEqual(len(issues), 6)
 
+    def test_vcard_error_properties(self):
+        error = VcardError("Some error", 3, 4)
+        self.assertEqual(error.message, "Some error at line 4, character 5")
+        self.assertEqual(error.line_index, 3)
+        self.assertEqual(error.character_index, 4)
 
 if __name__ == '__main__':
     unittest.main()
