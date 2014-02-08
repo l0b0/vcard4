@@ -7,9 +7,6 @@ from vcard4 import split_lines, verify_line_endings, VcardError
 MINIMAL_VCARD_LINES = ["BEGIN:VCARD", "VERSION:4.0", "FN:Rene van der Harten", "END:VCARD"]
 RFC5322_LINE_BREAK = "\r\n"
 MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK = RFC5322_LINE_BREAK.join(MINIMAL_VCARD_LINES)
-MINIMAL_VCARD_LINES_SEPARATED_BY_CARRIAGE_RETURN = "\r".join(MINIMAL_VCARD_LINES)
-MINIMAL_VCARD_LINES_SEPARATED_BY_NEWLINE = "\n".join(MINIMAL_VCARD_LINES)
-MINIMAL_VCARD_LINES_SEPARATED_BY_REVERSED_LINE_BREAK = "\n\r".join(MINIMAL_VCARD_LINES)
 
 
 class TestRFC6350(unittest.TestCase):
@@ -22,9 +19,12 @@ class TestRFC6350(unittest.TestCase):
         mocked_validator.assert_called_once_with(MINIMAL_VCARD_LINES)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error(self):
-        self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_CARRIAGE_RETURN)
-        self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_NEWLINE)
-        self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_REVERSED_LINE_BREAK)
+        minimal_vcard_lines_separated_by_carriage_return = "\r".join(MINIMAL_VCARD_LINES)
+        minimal_vcard_lines_separated_by_newline = "\n".join(MINIMAL_VCARD_LINES)
+        minimal_vcard_lines_separated_by_reversed_line_break = "\n\r".join(MINIMAL_VCARD_LINES)
+        self.assertRaises(VcardError, split_lines, minimal_vcard_lines_separated_by_carriage_return)
+        self.assertRaises(VcardError, split_lines, minimal_vcard_lines_separated_by_newline)
+        self.assertRaises(VcardError, split_lines, minimal_vcard_lines_separated_by_reversed_line_break)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error_content(self):
         invalid_vcard_lines = [MINIMAL_VCARD_LINES[0]] + [line + "\r" for line in MINIMAL_VCARD_LINES[1:]]
