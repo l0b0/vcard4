@@ -4,7 +4,7 @@ RFC5322_LINE_BREAK = "\r\n"
 INVALID_LINE_BREAKS_MATCHER = re.compile("|".join(RFC5322_LINE_BREAK))
 
 
-def verify_line_endings(lines):
+def validate_line_endings(lines):
     issues = []
     for line_index in range(len(lines)):
         for invalid_newline in INVALID_LINE_BREAKS_MATCHER.finditer(lines[line_index]):
@@ -12,7 +12,7 @@ def verify_line_endings(lines):
     return issues
 
 
-def split_lines(text, validator=verify_line_endings):
+def split_lines(text, validator=validate_line_endings):
     lines = text.split(RFC5322_LINE_BREAK)
     return {"lines": lines, "issues": validator(lines)}
 

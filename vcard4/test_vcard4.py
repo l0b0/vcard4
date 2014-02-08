@@ -1,7 +1,7 @@
 import mock
 import unittest
 
-from vcard4 import split_lines, verify_line_endings, VcardError
+from vcard4 import split_lines, validate_line_endings, VcardError
 
 
 MINIMAL_VCARD_LINES = ["BEGIN:VCARD", "VERSION:4.0", "FN:Rene van der Harten", "END:VCARD"]
@@ -26,14 +26,14 @@ class TestRFC6350(unittest.TestCase):
         self.assertEqual(len(result["issues"]), 2)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation(self):
-        self.assertEqual(verify_line_endings(MINIMAL_VCARD_LINES), [])
+        self.assertEqual(validate_line_endings(MINIMAL_VCARD_LINES), [])
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_error(self):
-        issues = verify_line_endings(["foo", "bar\nbaz"])
+        issues = validate_line_endings(["foo", "bar\nbaz"])
         self.assertEqual(len(issues), 1)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_multiple_errors(self):
-        issues = verify_line_endings(["fo\no\n", "\rban\r", "\r", "\n"])
+        issues = validate_line_endings(["fo\no\n", "\rban\r", "\r", "\n"])
         self.assertEqual(len(issues), 6)
 
     def test_vcard_error_properties(self):
