@@ -3,7 +3,7 @@ vCard4 module
 
 [![Build Status](https://jenkins.engmark.name:8080/buildStatus/icon?job=vcard4)](https://jenkins.engmark.name:8080/job/vcard4/)
 
-This program can be used for validation and parsing of vCard 4 (RFC 6350) files.
+This program can be used for validation and parsing of vCard 4 ([RFC 6350](http://tools.ietf.org/html/rfc6350)) files.
 
 Installation / upgrade
 ----------------------
