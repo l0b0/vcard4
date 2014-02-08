@@ -4,17 +4,17 @@ RFC5322_LINE_BREAK = "\r\n"
 INVALID_LINE_BREAKS_MATCHER = re.compile("|".join(RFC5322_LINE_BREAK))
 
 
-def split_lines(text):
-    lines = text.split(RFC5322_LINE_BREAK)
-    verify_line_endings(lines)
-    return lines
-
-
 def verify_line_endings(lines):
     for line_index in range(len(lines)):
         invalid_newlines = INVALID_LINE_BREAKS_MATCHER.search(lines[line_index])
         if invalid_newlines is not None:
             raise VcardError("Invalid line delimiter", line_index, invalid_newlines.start())
+
+
+def split_lines(text, validator=verify_line_endings):
+    lines = text.split(RFC5322_LINE_BREAK)
+    validator(lines)
+    return lines
 
 
 class VcardError(Exception):

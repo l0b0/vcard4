@@ -1,3 +1,4 @@
+import mock
 import unittest
 
 from vcard4 import split_lines, verify_line_endings, VcardError
@@ -17,6 +18,11 @@ class TestRFC6350(unittest.TestCase):
         self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_CARRIAGE_RETURN)
         self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_NEWLINE)
         self.assertRaises(VcardError, split_lines, MINIMAL_VCARD_LINES_SEPARATED_BY_REVERSED_LINE_BREAK)
+
+    def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_validation_delegation(self):
+        mocked_validator = mock.Mock()
+        split_lines(MINIMAL_VCARD_LINES_SEPARATED_BY_RFC5322_LINE_BREAK, mocked_validator)
+        mocked_validator.assert_called_once_with(MINIMAL_VCARD_LINES)
 
     def test_individual_lines_within_vcard_are_delimited_by_the_rfc5322_line_break_error(self):
         invalid_vcard_lines = [MINIMAL_VCARD_LINES[0]] + [line + "\r" for line in MINIMAL_VCARD_LINES[1:]]
